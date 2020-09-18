@@ -1,0 +1,40 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <value>
+          <list size="13">
+            <item index="0" class="java.lang.String" itemvalue="marisa-trie" />
+            <item index="1" class="java.lang.String" itemvalue="pytest" />
+            <item index="2" class="java.lang.String" itemvalue="PyLD" />
+            <item index="3" class="java.lang.String" itemvalue="psycopg2-binary" />
+            <item index="4" class="java.lang.String" itemvalue="numpy" />
+            <item index="5" class="java.lang.String" itemvalue="ordered_set" />
+            <item index="6" class="java.lang.String" itemvalue="langcodes" />
+            <item index="7" class="java.lang.String" itemvalue="ftfy" />
+            <item index="8" class="java.lang.String" itemvalue="tables" />
+            <item index="9" class="java.lang.String" itemvalue="snakemake" />
+            <item index="10" class="java.lang.String" itemvalue="xmltodict" />
+            <item index="11" class="java.lang.String" itemvalue="wordfreq" />
+            <item index="12" class="java.lang.String" itemvalue="msgpack-python" />
+          </list>
+        </value>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyPep8Inspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="ignoredErrors">
+        <list>
+          <option value="E722" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredIdentifiers">
+        <list>
+          <option value="typing.BinaryIO.raw" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
