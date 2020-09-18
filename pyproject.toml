@@ -4,6 +4,13 @@ version = "0.1.0"
 description = "Python library for managing ArangoDB instance"
 authors = ["Roman Inflianskas <infroma@gmail.com>"]
 license = "Apache-2.0"
+readme = "README.md"
+homepage = "https://github.com/ldtoolkit/graph-garden"
+repository = "https://github.com/ldtoolkit/graph-garden"
+keywords = ["arangodb"]
+classifiers = [
+    "Topic :: Database",
+]
 
 [tool.poetry.scripts]                                                                                                  
 graph-garden = "graph_garden.cli:app"
