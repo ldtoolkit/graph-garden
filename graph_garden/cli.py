@@ -1,5 +1,6 @@
 from graph_garden import arangodb
 from pathlib import Path
+from typing import Optional
 import sys
 import typer
 
@@ -10,7 +11,13 @@ app.add_typer(arangodb_app, name="arangodb")
 
 
 @arangodb_app.command()
-def install(path: Path = arangodb.DEFAULT_INSTALL_PATH):
+def list_versions(clear_cache: bool = False):
+    for version in arangodb.list_versions(clear_cache=clear_cache):
+        print(version)
+
+
+@arangodb_app.command()
+def install(path: Path = arangodb.DEFAULT_INSTALL_PATH, version: Optional[str] = None):
     arangodb.install(path)
 
 

@@ -1,19 +1,25 @@
+import appdirs
 from arango import ArangoClient, ArangoError
+from bs4 import BeautifulSoup
 from circus import get_arbiter
 from circus.arbiter import Arbiter
 from contextlib import suppress, contextmanager
+from distutils.version import LooseVersion
 from pathlib import Path
 from pySmartDL import SmartDL
 from sys import platform
-from typing import Optional
+from typing import Optional, List
 import os
 import psutil
+import re
+import requests
 import stat
 import tarfile
 import time
 
 
 ARANGODB_DEMON_PROCESS_NAME = "arangod"
+ARANGODB_DOWNLOAD_ROOT_URL = "https://download.arangodb.com/"
 CONCEPTNET_ROCKS_START_ARGUMENT = "start-arangodb"
 DEFAULT_INSTALL_PATH = Path("~/.arangodb").expanduser()
 DEFAULT_DATA_PATH = DEFAULT_INSTALL_PATH / "data"
@@ -27,11 +33,46 @@ START_SLEEP_DELAY = 0.1
 STOP_SLEEP_DELAY = 0.1
 
 
+def list_versions(clear_cache: bool = False) -> List[str]:
+    graph_garden_cache_path = Path(appdirs.user_cache_dir("graph-garden"))
+    arangodb_versions_path = graph_garden_cache_path / "arangodb_versions.txt"
+
+    if not clear_cache:
+        if arangodb_versions_path.is_file():
+            with open(arangodb_versions_path) as f:
+                result = [line.strip() for line in f.readlines()]
+            return result
+
+    req = requests.get(ARANGODB_DOWNLOAD_ROOT_URL)
+    soup = BeautifulSoup(req.content, 'html.parser')
+    links = [link.get("href") for link in soup.find_all("a")]
+    arangodb_major_version_index_pattern = r".*/arangodb(\d+)/index\.html"
+    arangodb_major_versions_links = [link for link in links if re.match(arangodb_major_version_index_pattern, link)]
+    arangodb_major_versions_links = [link for link in arangodb_major_versions_links if re.match(arangodb_major_version_index_pattern, link).group(1) >= "34"]
+    arangodb_major_versions_linux_links = [link.replace("index.html", "Community/Linux/index.html") for link in arangodb_major_versions_links]
+    result = []
+    for url in arangodb_major_versions_linux_links:
+        req = requests.get(url)
+        soup = BeautifulSoup(req.content, 'html.parser')
+        links = [link.get("href") for link in soup.find_all("a")]
+        arangodb_archive_pattern = r"^arangodb\d+-linux-(\d+\.\d+\.\d+(-\d+)?)\.tar\.gz$"
+        archive_links = [link for link in links if re.match(arangodb_archive_pattern, link)]
+        for archive_link in archive_links:
+            match = re.match(arangodb_archive_pattern, archive_link)
+            result.append(match.group(1))
+    result = sorted(result, key=lambda x: LooseVersion(x))
+    graph_garden_cache_path.mkdir(parents=True, exist_ok=True)
+    with open(arangodb_versions_path, "w") as f:
+        for version in result:
+            f.write(f"{version}\n")
+    return result
+
+
 def get_exe_path(path: Path = DEFAULT_INSTALL_PATH, program_name: str = "arangodb") -> Path:
     return path / "bin" / program_name if path.name != "arangodb" else path
 
 
-def install(path: Path = DEFAULT_INSTALL_PATH) -> None:
+def install(path: Path = DEFAULT_INSTALL_PATH, version: Optional[str] = None) -> None:
     if platform != "linux":
         raise RuntimeError("Only GNU/Linux is supported!")
 
@@ -47,7 +88,12 @@ def install(path: Path = DEFAULT_INSTALL_PATH) -> None:
 
     path.mkdir(parents=True, exist_ok=True)
 
-    url = "https://download.arangodb.com/arangodb37/Community/Linux/arangodb3-linux-3.7.2.tar.gz"
+    if version is None:
+        version = list_versions()[-1]
+    version = LooseVersion(version)
+    top_dir_name = f"arangodb{version.version[0]}{version.version[1]}"
+    file_name = f"arangodb{version.version[0]}-linux-{version}.tar.gz"
+    url = f"{ARANGODB_DOWNLOAD_ROOT_URL}{top_dir_name}/Community/Linux/{file_name}"
     downloader = SmartDL(url, str(path))
     downloader.start()
     archive_path_str = downloader.get_dest()
