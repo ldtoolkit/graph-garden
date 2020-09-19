@@ -18,7 +18,7 @@ def list_versions(clear_cache: bool = False):
 
 @arangodb_app.command()
 def install(path: Path = arangodb.DEFAULT_INSTALL_PATH, version: Optional[str] = None):
-    arangodb.install(path)
+    arangodb.install(path=path, version=version)
 
 
 @arangodb_app.command()
