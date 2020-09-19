@@ -1,4 +1,3 @@
-import appdirs
 from arango import ArangoClient, ArangoError
 from bs4 import BeautifulSoup
 from circus import get_arbiter
@@ -9,6 +8,7 @@ from pathlib import Path
 from pySmartDL import SmartDL
 from sys import platform
 from typing import Optional, List
+import appdirs
 import os
 import psutil
 import re
