@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "graph-garden"
-version = "0.1.1"
+version = "0.1.2"
 description = "Python library for managing ArangoDB instance"
 authors = ["Roman Inflianskas <infroma@gmail.com>"]
 license = "Apache-2.0"
